@@ -2,7 +2,6 @@ package org.example.bookstore.repository;
 
 import java.util.List;
 import org.example.bookstore.exception.DataProcessingException;
-import org.example.bookstore.exception.EntityNotFoundException;
 import org.example.bookstore.model.Book;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -57,8 +56,8 @@ public class BookRepositoryImpl implements BookRepository {
         try (Session session = sessionFactory.openSession()) {
             return session.find(Book.class, id);
         } catch (Exception e) {
-            throw new EntityNotFoundException("Cannot find a book with id: "
-                    + id);
+            throw new DataProcessingException("Cannot find a book in DB with id: "
+                    + id, e);
         }
     }
 }

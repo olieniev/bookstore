@@ -1,6 +1,7 @@
 package org.example.bookstore.service;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.example.bookstore.dto.BookDto;
 import org.example.bookstore.dto.CreateBookRequestDto;
@@ -24,11 +25,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto getById(Long id) {
-        Book book = bookRepository.getById(id);
-        if (book == null) {
-            throw new EntityNotFoundException("Cannot find a book with id: "
-                    + id);
-        }
+        Book book = Optional.ofNullable(bookRepository.getById(id))
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Cannot find a book with id: " + id));
         return bookMapper.toDto(book);
     }
 
