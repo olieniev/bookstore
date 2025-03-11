@@ -2,6 +2,7 @@ package org.example.bookstore.repository;
 
 import java.util.List;
 import org.example.bookstore.exception.DataProcessingException;
+import org.example.bookstore.exception.EntityNotFoundException;
 import org.example.bookstore.model.Book;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -48,6 +49,16 @@ public class BookRepositoryImpl implements BookRepository {
                     .getResultList();
         } catch (Exception e) {
             throw new DataProcessingException("Can't get all books from DB.", e);
+        }
+    }
+
+    @Override
+    public Book getById(Long id) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.find(Book.class, id);
+        } catch (Exception e) {
+            throw new EntityNotFoundException("Cannot find a book with id: "
+                    + id);
         }
     }
 }
