@@ -1,7 +1,6 @@
 package org.example.bookstore.service;
 
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.example.bookstore.dto.BookDto;
 import org.example.bookstore.dto.CreateBookRequestDto;
@@ -18,14 +17,14 @@ public class BookServiceImpl implements BookService {
     private final BookMapper bookMapper;
 
     @Override
-    public BookDto save(CreateBookRequestDto requestDto) {
-        Book book = bookMapper.toModel(requestDto);
+    public BookDto save(CreateBookRequestDto bookDto) {
+        Book book = bookMapper.toModel(bookDto);
         return bookMapper.toDto(bookRepository.save(book));
     }
 
     @Override
     public BookDto getById(Long id) {
-        Book book = Optional.ofNullable(bookRepository.getById(id))
+        Book book = bookRepository.findById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Cannot find a book with id: " + id));
         return bookMapper.toDto(book);
@@ -37,5 +36,18 @@ public class BookServiceImpl implements BookService {
                 .stream()
                 .map(bookMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    public BookDto update(Long id, CreateBookRequestDto bookDto) {
+        Book book = bookRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Cannot find a book with id: " + id));
+        bookMapper.updateBookFromDto(bookDto, book);
+        return bookMapper.toDto(bookRepository.save(book));
+    }
+
+    @Override
+    public void delete(Long id) {
+        bookRepository.deleteById(id);
     }
 }
