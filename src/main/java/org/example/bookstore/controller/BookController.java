@@ -3,6 +3,7 @@ package org.example.bookstore.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.example.bookstore.dto.BookDto;
+import org.example.bookstore.dto.BookSearchParameters;
 import org.example.bookstore.dto.CreateBookRequestDto;
 import org.example.bookstore.service.BookService;
 import org.springframework.http.HttpStatus;
@@ -47,5 +48,10 @@ public class BookController {
     @DeleteMapping("/{id}")
     public void deleteBook(@PathVariable Long id) {
         bookService.delete(id);
+    }
+
+    @GetMapping("/search")
+    public List<BookDto> search(BookSearchParameters params) {
+        return bookService.search(params);
     }
 }
