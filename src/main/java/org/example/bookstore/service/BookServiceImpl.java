@@ -1,6 +1,5 @@
 package org.example.bookstore.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.example.bookstore.dto.BookDto;
 import org.example.bookstore.dto.BookSearchParameters;
@@ -10,6 +9,8 @@ import org.example.bookstore.mapper.BookMapper;
 import org.example.bookstore.model.Book;
 import org.example.bookstore.repository.book.BookRepository;
 import org.example.bookstore.repository.book.BookSpecificationBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -35,11 +36,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDto> findAll() {
-        return bookRepository.findAll()
-                .stream()
-                .map(bookMapper::toDto)
-                .toList();
+    public Page<BookDto> findAll(Pageable pageable) {
+        return bookRepository.findAll(pageable).map(bookMapper::toDto);
     }
 
     @Override
@@ -56,11 +54,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDto> search(BookSearchParameters params) {
+    public Page<BookDto> search(BookSearchParameters params, Pageable pageable) {
         Specification<Book> bookSpecification = bookSpecificationBuilder.build(params);
-        return bookRepository.findAll(bookSpecification)
-                .stream()
-                .map(bookMapper::toDto)
-                .toList();
+        return bookRepository.findAll(bookSpecification, pageable).map(bookMapper::toDto);
     }
 }

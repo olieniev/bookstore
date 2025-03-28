@@ -1,14 +1,15 @@
 package org.example.bookstore.service;
 
-import java.util.List;
 import org.example.bookstore.dto.BookDto;
 import org.example.bookstore.dto.BookSearchParameters;
 import org.example.bookstore.dto.CreateBookRequestDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface BookService {
     BookDto save(CreateBookRequestDto requestDto);
 
-    List<BookDto> findAll();
+    Page<BookDto> findAll(Pageable pageable);
 
     BookDto getById(Long id);
 
@@ -16,5 +17,5 @@ public interface BookService {
 
     void delete(Long id);
 
-    List<BookDto> search(BookSearchParameters params);
+    Page<BookDto> search(BookSearchParameters params, Pageable pageable);
 }
