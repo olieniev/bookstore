@@ -11,6 +11,8 @@ import org.example.bookstore.service.BookService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +34,7 @@ public class BookController {
     @GetMapping
     @Operation(summary = "Get all method",
             description = "Returns all books")
-    public Page<BookDto> getAll(Pageable pageable) {
+    public Page<BookDto> getAll(Authentication authentication, Pageable pageable) {
         return bookService.findAll(pageable);
     }
 
@@ -43,6 +45,7 @@ public class BookController {
         return bookService.getById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     @Operation(summary = "Create a book method",
             description = "Creates a book with given parameters")
@@ -50,6 +53,7 @@ public class BookController {
         return bookService.save(bookDto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
     @Operation(summary = "Update book method",
@@ -59,6 +63,7 @@ public class BookController {
         return bookService.update(id, bookDto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete book method",
             description = "Delete book by id")
     @ResponseStatus(HttpStatus.NO_CONTENT)
