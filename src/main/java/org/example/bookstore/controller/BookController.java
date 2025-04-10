@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BookController {
     private final BookService bookService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping
     @Operation(summary = "Get all method",
             description = "Returns all books")
@@ -38,6 +39,7 @@ public class BookController {
         return bookService.findAll(pageable);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/{id}")
     @Operation(summary = "Get by Id method",
             description = "Returns a book by given id")
@@ -72,6 +74,7 @@ public class BookController {
         bookService.delete(id);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @Operation(summary = "Get book by parameters method",
             description = "Returns pageable parametrized sorted (if needed) result")
     @GetMapping("/search")
