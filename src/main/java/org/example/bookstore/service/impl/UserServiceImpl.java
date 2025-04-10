@@ -12,14 +12,18 @@ import org.example.bookstore.security.Role;
 import org.example.bookstore.security.RoleName;
 import org.example.bookstore.security.RoleRepository;
 import org.example.bookstore.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto) {
@@ -30,6 +34,7 @@ public class UserServiceImpl implements UserService {
         User registeredUser = userMapper.toModel(requestDto);
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER);
         registeredUser.setRoles(Set.of(userRole));
+        registeredUser.setPassword(passwordEncoder.encode(registeredUser.getPassword()));
         return userMapper.toUserResponseDto(userRepository.save(registeredUser));
     }
 }
