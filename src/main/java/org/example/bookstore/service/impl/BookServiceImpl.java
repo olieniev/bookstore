@@ -1,6 +1,8 @@
 package org.example.bookstore.service.impl;
 
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.example.bookstore.dto.book.BookDto;
 import org.example.bookstore.dto.book.BookDtoWithoutCategoryIds;
@@ -30,10 +32,10 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto save(CreateBookRequestDto bookDto) {
         Book book = bookMapper.toModel(bookDto);
-        setCategoriesFromIds(book, bookDto);
-        Book savedBook = bookRepository.save(book);
-        BookDto dto = bookMapper.toDto(savedBook);
-        setCategoryIds(dto, savedBook);
+        book.setCategories(categoriesIdToCategories(bookDto.getCategoryIds()));
+        bookRepository.save(book);
+        BookDto dto = bookMapper.toDto(book);
+        setCategoryIds(dto, book);
         return dto;
     }
 
@@ -61,11 +63,11 @@ public class BookServiceImpl implements BookService {
     public BookDto update(Long id, CreateBookRequestDto bookDto) {
         Book book = bookRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Cannot find a book with id: " + id));
-        setCategoriesFromIds(book, bookDto);
+        book.setCategories(categoriesIdToCategories(bookDto.getCategoryIds()));
         bookMapper.updateBookFromDto(bookDto, book);
-        Book savedBook = bookRepository.save(book);
-        BookDto dto = bookMapper.toDto(savedBook);
-        setCategoryIds(dto, savedBook);
+        bookRepository.save(book);
+        BookDto dto = bookMapper.toDto(book);
+        setCategoryIds(dto, book);
         return dto;
     }
 
@@ -91,14 +93,10 @@ public class BookServiceImpl implements BookService {
             .map(bookMapper::toDtoWithoutCategories);
     }
 
-    private void setCategoriesFromIds(Book book, CreateBookRequestDto bookDto) {
-        if (bookDto.getCategoryIds() != null) {
-            book.setCategories(
-                new HashSet<>(categoryRepository.findAllById(bookDto.getCategoryIds()))
-            );
-        } else {
-            book.setCategories(new HashSet<>());
-        }
+    private Set<Category> categoriesIdToCategories(List<Long> categories) {
+        return categories.stream()
+            .map(categoryRepository::getReferenceById)
+            .collect(Collectors.toSet());
     }
 
     private void setCategoryIds(BookDto bookDto, Book book) {
