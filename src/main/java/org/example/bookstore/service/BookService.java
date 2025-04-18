@@ -1,6 +1,7 @@
 package org.example.bookstore.service;
 
 import org.example.bookstore.dto.book.BookDto;
+import org.example.bookstore.dto.book.BookDtoWithoutCategoryIds;
 import org.example.bookstore.dto.book.BookSearchParameters;
 import org.example.bookstore.dto.book.CreateBookRequestDto;
 import org.springframework.data.domain.Page;
@@ -18,4 +19,6 @@ public interface BookService {
     void delete(Long id);
 
     Page<BookDto> search(BookSearchParameters params, Pageable pageable);
+
+    Page<BookDtoWithoutCategoryIds> getByCategoriesId(Long id, Pageable pageable);
 }

@@ -11,3 +11,7 @@ databaseChangeLog:
       file: db/changelog/changes/05-add-is-deleted-default-value.yaml
   - include:
       file: db/changelog/changes/06-insert-roles-and-users.yaml
+  - include:
+      file: db/changelog/changes/07-create-categories-table.yaml
+  - include:
+      file: db/changelog/changes/08-create-books-categories-table.yaml
