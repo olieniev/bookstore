@@ -1,12 +1,16 @@
 package org.example.bookstore.service.impl;
 
+import java.util.HashSet;
 import lombok.RequiredArgsConstructor;
 import org.example.bookstore.dto.book.BookDto;
+import org.example.bookstore.dto.book.BookDtoWithoutCategoryIds;
 import org.example.bookstore.dto.book.BookSearchParameters;
 import org.example.bookstore.dto.book.CreateBookRequestDto;
 import org.example.bookstore.exception.EntityNotFoundException;
 import org.example.bookstore.mapper.BookMapper;
 import org.example.bookstore.model.Book;
+import org.example.bookstore.model.Category;
+import org.example.bookstore.repository.CategoryRepository;
 import org.example.bookstore.repository.book.BookRepository;
 import org.example.bookstore.repository.book.BookSpecificationBuilder;
 import org.example.bookstore.service.BookService;
@@ -19,13 +23,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
+    private final CategoryRepository categoryRepository;
     private final BookMapper bookMapper;
     private final BookSpecificationBuilder bookSpecificationBuilder;
 
     @Override
     public BookDto save(CreateBookRequestDto bookDto) {
         Book book = bookMapper.toModel(bookDto);
-        return bookMapper.toDto(bookRepository.save(book));
+        setCategoriesFromIds(book, bookDto);
+        Book savedBook = bookRepository.save(book);
+        BookDto dto = bookMapper.toDto(savedBook);
+        setCategoryIds(dto, savedBook);
+        return dto;
     }
 
     @Override
@@ -33,20 +42,31 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Cannot find a book with id: " + id));
-        return bookMapper.toDto(book);
+        BookDto dto = bookMapper.toDto(book);
+        setCategoryIds(dto, book);
+        return dto;
     }
 
     @Override
     public Page<BookDto> findAll(Pageable pageable) {
-        return bookRepository.findAll(pageable).map(bookMapper::toDto);
+        Page<Book> bookPage = bookRepository.findAll(pageable);
+        return bookPage.map(book -> {
+            BookDto dto = bookMapper.toDto(book);
+            setCategoryIds(dto, book);
+            return dto;
+        });
     }
 
     @Override
     public BookDto update(Long id, CreateBookRequestDto bookDto) {
         Book book = bookRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Cannot find a book with id: " + id));
+        setCategoriesFromIds(book, bookDto);
         bookMapper.updateBookFromDto(bookDto, book);
-        return bookMapper.toDto(bookRepository.save(book));
+        Book savedBook = bookRepository.save(book);
+        BookDto dto = bookMapper.toDto(savedBook);
+        setCategoryIds(dto, savedBook);
+        return dto;
     }
 
     @Override
@@ -57,6 +77,34 @@ public class BookServiceImpl implements BookService {
     @Override
     public Page<BookDto> search(BookSearchParameters params, Pageable pageable) {
         Specification<Book> bookSpecification = bookSpecificationBuilder.build(params);
-        return bookRepository.findAll(bookSpecification, pageable).map(bookMapper::toDto);
+        Page<Book> bookPage = bookRepository.findAll(bookSpecification, pageable);
+        return bookPage.map(book -> {
+            BookDto dto = bookMapper.toDto(book);
+            setCategoryIds(dto, book);
+            return dto;
+        });
+    }
+
+    @Override
+    public Page<BookDtoWithoutCategoryIds> getByCategoriesId(Long id, Pageable pageable) {
+        return bookRepository.findAllByCategoriesId(id, pageable)
+            .map(bookMapper::toDtoWithoutCategories);
+    }
+
+    private void setCategoriesFromIds(Book book, CreateBookRequestDto bookDto) {
+        if (bookDto.getCategoryIds() != null) {
+            book.setCategories(
+                new HashSet<>(categoryRepository.findAllById(bookDto.getCategoryIds()))
+            );
+        } else {
+            book.setCategories(new HashSet<>());
+        }
+    }
+
+    private void setCategoryIds(BookDto bookDto, Book book) {
+        bookDto.setCategoryIds(book.getCategories().stream()
+                .map(Category::getId)
+                .toList()
+        );
     }
 }
