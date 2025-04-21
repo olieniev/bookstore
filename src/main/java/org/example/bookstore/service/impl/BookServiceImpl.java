@@ -18,7 +18,6 @@ import org.example.bookstore.repository.book.BookSpecificationBuilder;
 import org.example.bookstore.service.BookService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,29 +33,19 @@ public class BookServiceImpl implements BookService {
         Book book = bookMapper.toModel(bookDto);
         book.setCategories(categoriesIdToCategories(bookDto.getCategoryIds()));
         bookRepository.save(book);
-        BookDto dto = bookMapper.toDto(book);
-        setCategoryIds(dto, book);
-        return dto;
+        return bookMapper.toDto(book);
     }
 
     @Override
     public BookDto getById(Long id) {
-        Book book = bookRepository.findById(id)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Cannot find a book with id: " + id));
-        BookDto dto = bookMapper.toDto(book);
-        setCategoryIds(dto, book);
-        return dto;
+        return bookMapper.toDto(bookRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Cannot find a book with id: " + id)));
     }
 
     @Override
     public Page<BookDto> findAll(Pageable pageable) {
-        Page<Book> bookPage = bookRepository.findAll(pageable);
-        return bookPage.map(book -> {
-            BookDto dto = bookMapper.toDto(book);
-            setCategoryIds(dto, book);
-            return dto;
-        });
+        return bookRepository.findAll(pageable)
+            .map(bookMapper::toDto);
     }
 
     @Override
@@ -66,9 +55,7 @@ public class BookServiceImpl implements BookService {
         book.setCategories(categoriesIdToCategories(bookDto.getCategoryIds()));
         bookMapper.updateBookFromDto(bookDto, book);
         bookRepository.save(book);
-        BookDto dto = bookMapper.toDto(book);
-        setCategoryIds(dto, book);
-        return dto;
+        return bookMapper.toDto(book);
     }
 
     @Override
@@ -78,13 +65,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Page<BookDto> search(BookSearchParameters params, Pageable pageable) {
-        Specification<Book> bookSpecification = bookSpecificationBuilder.build(params);
-        Page<Book> bookPage = bookRepository.findAll(bookSpecification, pageable);
-        return bookPage.map(book -> {
-            BookDto dto = bookMapper.toDto(book);
-            setCategoryIds(dto, book);
-            return dto;
-        });
+        return bookRepository.findAll(bookSpecificationBuilder.build(params), pageable)
+            .map(bookMapper::toDto);
     }
 
     @Override
@@ -97,12 +79,5 @@ public class BookServiceImpl implements BookService {
         return categories.stream()
             .map(categoryRepository::getReferenceById)
             .collect(Collectors.toSet());
-    }
-
-    private void setCategoryIds(BookDto bookDto, Book book) {
-        bookDto.setCategoryIds(book.getCategories().stream()
-                .map(Category::getId)
-                .toList()
-        );
     }
 }
