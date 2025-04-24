@@ -6,7 +6,9 @@ import org.example.bookstore.dto.user.UserRegistrationRequestDto;
 import org.example.bookstore.dto.user.UserResponseDto;
 import org.example.bookstore.exception.RegistrationException;
 import org.example.bookstore.mapper.UserMapper;
+import org.example.bookstore.model.ShoppingCart;
 import org.example.bookstore.model.User;
+import org.example.bookstore.repository.ShoppingCartRepository;
 import org.example.bookstore.repository.UserRepository;
 import org.example.bookstore.security.Role;
 import org.example.bookstore.security.RoleName;
@@ -24,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ShoppingCartRepository shoppingCartRepository;
 
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto) {
@@ -35,6 +38,10 @@ public class UserServiceImpl implements UserService {
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER);
         registeredUser.setRoles(Set.of(userRole));
         registeredUser.setPassword(passwordEncoder.encode(registeredUser.getPassword()));
-        return userMapper.toUserResponseDto(userRepository.save(registeredUser));
+        User savedUser = userRepository.save(registeredUser);
+        ShoppingCart cart = new ShoppingCart();
+        cart.setUser(savedUser);
+        shoppingCartRepository.save(cart);
+        return userMapper.toUserResponseDto(savedUser);
     }
 }
