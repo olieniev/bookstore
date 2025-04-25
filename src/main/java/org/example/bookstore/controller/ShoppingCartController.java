@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.bookstore.dto.shoppingcart.AddBookToCartDto;
-import org.example.bookstore.dto.shoppingcart.CartItemDto;
 import org.example.bookstore.dto.shoppingcart.ShoppingCartDto;
 import org.example.bookstore.dto.shoppingcart.UpdateBookQuantityDto;
 import org.example.bookstore.service.ShoppingCartService;
@@ -42,7 +41,7 @@ public class ShoppingCartController {
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "Create cart item method",
             description = "Creates book item in cart")
-    public CartItemDto create(Authentication authentication,
+    public ShoppingCartDto create(Authentication authentication,
                               @RequestBody @Valid AddBookToCartDto dto) {
         return shoppingCartService.save(authentication, dto);
     }
@@ -52,7 +51,7 @@ public class ShoppingCartController {
     @Operation(summary = "Update cart item method",
             description = "Updates book item quantity in cart")
     @ResponseStatus(HttpStatus.OK)
-    public CartItemDto update(Authentication authentication, @PathVariable Long id,
+    public ShoppingCartDto update(Authentication authentication, @PathVariable Long id,
                                       @RequestBody @Valid UpdateBookQuantityDto dto) {
         return shoppingCartService.update(authentication, id, dto);
     }

@@ -2,11 +2,9 @@ package org.example.bookstore.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bookstore.dto.shoppingcart.AddBookToCartDto;
-import org.example.bookstore.dto.shoppingcart.CartItemDto;
 import org.example.bookstore.dto.shoppingcart.ShoppingCartDto;
 import org.example.bookstore.dto.shoppingcart.UpdateBookQuantityDto;
 import org.example.bookstore.exception.EntityNotFoundException;
-import org.example.bookstore.mapper.CartItemMapper;
 import org.example.bookstore.mapper.ShoppingCartMapper;
 import org.example.bookstore.model.Book;
 import org.example.bookstore.model.CartItem;
@@ -28,7 +26,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final CartItemRepository cartItemRepository;
     private final BookRepository bookRepository;
     private final ShoppingCartMapper shoppingCartMapper;
-    private final CartItemMapper cartItemMapper;
 
     @Override
     public ShoppingCartDto getCart(Authentication authentication) {
@@ -36,7 +33,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public CartItemDto save(Authentication authentication, AddBookToCartDto dto) {
+    public ShoppingCartDto save(Authentication authentication, AddBookToCartDto dto) {
         ShoppingCart cart = findCart(authentication);
         Book book = bookRepository.findById(dto.id()).orElseThrow(
                 () -> new EntityNotFoundException("No book found with id: " + dto.id())
@@ -46,17 +43,20 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         item.setBook(book);
         item.setQuantity(dto.quantity());
         cart.getCartItems().add(item);
-        return cartItemMapper.toDto(cartItemRepository.save(item));
+        return shoppingCartMapper.toDto(shoppingCartRepository.save(cart));
     }
 
     @Override
-    public CartItemDto update(Authentication authentication, Long id, UpdateBookQuantityDto dto) {
+    public ShoppingCartDto update(Authentication authentication,
+                                  Long id, UpdateBookQuantityDto dto) {
+        ShoppingCart cart = findCart(authentication);
         CartItem cartItem = cartItemRepository
                 .findByIdAndShoppingCart(id, findCart(authentication)).orElseThrow(
                     () -> new EntityNotFoundException("Can't find user cart item with id: " + id)
         );
         cartItem.setQuantity(dto.quantity());
-        return cartItemMapper.toDto(cartItemRepository.save(cartItem));
+        cartItemRepository.save(cartItem);
+        return shoppingCartMapper.toDto(cart);
     }
 
     @Override
@@ -64,7 +64,15 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         cartItemRepository.deleteByIdAndShoppingCart(id, findCart(authentication));
     }
 
+    @Override
+    public ShoppingCart createShoppingCart(User user) {
+        ShoppingCart cart = new ShoppingCart();
+        cart.setUser(user);
+        return shoppingCartRepository.save(cart);
+    }
+
     private ShoppingCart findCart(Authentication authentication) {
-        return shoppingCartRepository.findByUser((User) authentication.getPrincipal());
+        User user = (User) authentication.getPrincipal();
+        return shoppingCartRepository.findByUserId(user.getId());
     }
 }
