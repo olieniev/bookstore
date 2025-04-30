@@ -18,4 +18,6 @@ public interface ShoppingCartService {
     void delete(Authentication authentication, Long id);
 
     ShoppingCart createShoppingCart(User user);
+
+    void clearShoppingCart(ShoppingCart cart);
 }
