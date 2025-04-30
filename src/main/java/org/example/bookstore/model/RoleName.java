@@ -1,4 +1,4 @@
-package org.example.bookstore.security;
+package org.example.bookstore.model;
 
 public enum RoleName {
     ROLE_ADMIN,
