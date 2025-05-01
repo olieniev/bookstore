@@ -1,7 +1,7 @@
 package org.example.bookstore.service.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.example.bookstore.dto.order.CreateOrderRequestDto;
@@ -9,6 +9,7 @@ import org.example.bookstore.dto.order.OrderDto;
 import org.example.bookstore.dto.order.OrderItemDto;
 import org.example.bookstore.dto.order.UpdateOrderRequestDto;
 import org.example.bookstore.exception.EntityNotFoundException;
+import org.example.bookstore.exception.OrderProcessingException;
 import org.example.bookstore.mapper.OrderItemMapper;
 import org.example.bookstore.mapper.OrderMapper;
 import org.example.bookstore.model.Order;
@@ -42,23 +43,11 @@ public class OrderServiceImpl implements OrderService {
         User user = findUser(authentication);
         ShoppingCart cart = shoppingCartRepository.findByUserId(user.getId());
         if (cart.getCartItems().isEmpty()) {
-            throw new EntityNotFoundException("Can't create an order from an empty cart!");
+            throw new OrderProcessingException("Can't create an order from an empty cart!");
         }
         Order order = orderMapper.toModel(requestDto);
         order.setUser(user);
-        order.setOrderDate(LocalDateTime.now());
-        order.setOrderItems(
-                cart.getCartItems().stream()
-                .map(cartItem -> {
-                    OrderItem orderItem = new OrderItem();
-                    orderItem.setOrder(order);
-                    orderItem.setBook(cartItem.getBook());
-                    orderItem.setQuantity(cartItem.getQuantity());
-                    orderItem.setPrice(cartItem.getBook().getPrice());
-                    return orderItem;
-                })
-                .collect(Collectors.toSet())
-        );
+        order.setOrderItems(mapCartToOrderItems(cart, order));
         order.setTotal(
                 order.getOrderItems().stream()
                 .map(item ->
@@ -77,9 +66,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderItemDto> getOrderItems(Authentication authentication,
-                                            Long orderId,
-                                            Pageable pageable
+    public Page<OrderItemDto> getOrderItems(
+            Authentication authentication,
+            Long orderId,
+            Pageable pageable
     ) {
         return orderItemRepository.findAllByOrderIdAndOrderUserId(
             orderId, findUser(authentication).getId(), pageable
@@ -106,5 +96,18 @@ public class OrderServiceImpl implements OrderService {
 
     private User findUser(Authentication auth) {
         return (User) auth.getPrincipal();
+    }
+
+    private Set<OrderItem> mapCartToOrderItems(ShoppingCart cart, Order order) {
+        return cart.getCartItems().stream()
+            .map(cartItem -> {
+                OrderItem orderItem = new OrderItem();
+                orderItem.setOrder(order);
+                orderItem.setBook(cartItem.getBook());
+                orderItem.setQuantity(cartItem.getQuantity());
+                orderItem.setPrice(cartItem.getBook().getPrice());
+                return orderItem;
+            })
+            .collect(Collectors.toSet());
     }
 }

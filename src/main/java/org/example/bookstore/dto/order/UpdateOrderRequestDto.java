@@ -1,10 +1,10 @@
 package org.example.bookstore.dto.order;
 
 import jakarta.validation.constraints.NotNull;
-import org.example.bookstore.model.Status;
+import org.example.bookstore.model.Order;
 
 public record UpdateOrderRequestDto(
         @NotNull
-        Status status
+        Order.Status status
 ) {
 }

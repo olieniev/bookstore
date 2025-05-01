@@ -1,16 +1,16 @@
 package org.example.bookstore.dto.order;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
-import org.example.bookstore.model.Status;
+import org.example.bookstore.model.Order;
 
 public record OrderDto(
         Long id,
         Long userId,
         Set<OrderItemDto> orderItems,
-        LocalDate orderDate,
+        LocalDateTime orderDate,
         BigDecimal total,
-        Status status
+        Order.Status status
 ) {
 }
