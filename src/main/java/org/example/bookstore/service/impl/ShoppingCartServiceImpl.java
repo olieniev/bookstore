@@ -71,6 +71,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCartRepository.save(cart);
     }
 
+    @Override
+    public void clearShoppingCart(ShoppingCart cart) {
+        cart.getCartItems().clear();
+        shoppingCartRepository.save(cart);
+    }
+
     private ShoppingCart findCart(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         return shoppingCartRepository.findByUserId(user.getId());
