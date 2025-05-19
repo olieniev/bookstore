@@ -4,6 +4,8 @@ import static org.example.bookstore.util.BookUtil.createBook;
 import static org.example.bookstore.util.BookUtil.createBookRequestDto;
 import static org.example.bookstore.util.BookUtil.createCategory;
 import static org.example.bookstore.util.BookUtil.mapBookDtoToBook;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,7 +21,6 @@ import org.example.bookstore.model.Category;
 import org.example.bookstore.repository.CategoryRepository;
 import org.example.bookstore.repository.book.BookRepository;
 import org.example.bookstore.service.impl.BookServiceImpl;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +54,7 @@ public class BookServiceTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookMapper.toDto(book)).thenReturn(expected);
         BookDto actual = bookService.getById(bookId);
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
         verify(bookRepository).findById(bookId);
         verify(bookMapper).toDto(book);
     }
@@ -65,7 +66,7 @@ public class BookServiceTest {
     public void getBookById_invalidId_throwsException() {
         Long bookId = 999L;
         when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
-        Assertions.assertThrows(EntityNotFoundException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> bookService.getById(bookId));
         verify(bookRepository).findById(bookId);
     }
@@ -86,7 +87,7 @@ public class BookServiceTest {
         when(bookRepository.save(book)).thenReturn(book);
         when(bookMapper.toDto(book)).thenReturn(expected);
         BookDto actual = bookService.save(requestDto);
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
         verify(bookMapper).toModel(requestDto);
         verify(categoryRepository).getReferenceById(categoryId);
         verify(bookRepository).save(book);
@@ -111,7 +112,7 @@ public class BookServiceTest {
         when(bookRepository.save(book)).thenReturn(book);
         when(bookMapper.toDto(book)).thenReturn(expected);
         BookDto actual = bookService.update(bookId, requestDto);
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
         verify(bookRepository).findById(bookId);
         verify(categoryRepository).getReferenceById(categoryId);
         verify(bookMapper).updateBookFromDto(requestDto, book);
@@ -129,7 +130,7 @@ public class BookServiceTest {
         Long categoryId = 1L;
         CreateBookRequestDto requestDto = createBookRequestDto(categoryId);
         when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
-        Assertions.assertThrows(EntityNotFoundException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> bookService.update(bookId, requestDto));
         verify(bookRepository).findById(bookId);
     }
@@ -158,7 +159,7 @@ public class BookServiceTest {
         when(bookRepository.findAll(pageable)).thenReturn(pageOfBooks);
         when(bookMapper.toDto(book)).thenReturn(bookDto);
         Page<BookDto> actual = bookService.findAll(pageable);
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
         verify(bookRepository).findAll(pageable);
         verify(bookMapper).toDto(book);
     }

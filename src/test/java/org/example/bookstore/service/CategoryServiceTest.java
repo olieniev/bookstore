@@ -3,6 +3,8 @@ package org.example.bookstore.service;
 import static org.example.bookstore.util.CategoryUtil.createCategory;
 import static org.example.bookstore.util.CategoryUtil.createCategoryRequestDto;
 import static org.example.bookstore.util.CategoryUtil.mapCategoryDtoToCategory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,7 +18,6 @@ import org.example.bookstore.mapper.CategoryMapper;
 import org.example.bookstore.model.Category;
 import org.example.bookstore.repository.CategoryRepository;
 import org.example.bookstore.service.impl.CategoryServiceImpl;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +49,7 @@ public class CategoryServiceTest {
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
         when(categoryMapper.toDto(category)).thenReturn(expected);
         CategoryDto actual = categoryService.getById(categoryId);
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
         verify(categoryRepository).findById(categoryId);
         verify(categoryMapper).toDto(category);
     }
@@ -60,7 +61,7 @@ public class CategoryServiceTest {
     public void getBookById_invalidId_throwsException() {
         Long categoryId = 999L;
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
-        Assertions.assertThrows(EntityNotFoundException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> categoryService.getById(categoryId));
         verify(categoryRepository).findById(categoryId);
     }
@@ -78,7 +79,7 @@ public class CategoryServiceTest {
         when(categoryRepository.save(category)).thenReturn(category);
         when(categoryMapper.toDto(category)).thenReturn(expected);
         CategoryDto actual = categoryService.save(requestDto);
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
         verify(categoryMapper).toModel(requestDto);
         verify(categoryRepository).save(category);
         verify(categoryMapper).toDto(category);
@@ -98,7 +99,7 @@ public class CategoryServiceTest {
         when(categoryRepository.save(category)).thenReturn(category);
         when(categoryMapper.toDto(category)).thenReturn(expected);
         CategoryDto actual = categoryService.update(categoryId, requestDto);
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
         verify(categoryRepository).findById(categoryId);
         verify(categoryMapper).updateCategoryFromDto(requestDto, category);
         verify(categoryRepository).save(category);
@@ -113,7 +114,7 @@ public class CategoryServiceTest {
         Long categoryId = 1L;
         CategoryRequestDto requestDto = createCategoryRequestDto();
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
-        Assertions.assertThrows(EntityNotFoundException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> categoryService.update(categoryId, requestDto));
         verify(categoryRepository).findById(categoryId);
     }
@@ -142,7 +143,7 @@ public class CategoryServiceTest {
         when(categoryRepository.findAll(pageable)).thenReturn(pageOfCategory);
         when(categoryMapper.toDto(category)).thenReturn(categoryDto);
         Page<CategoryDto> actual = categoryService.findAll(pageable);
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
         verify(categoryRepository).findAll(pageable);
         verify(categoryMapper).toDto(category);
     }

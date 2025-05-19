@@ -3,6 +3,9 @@ package org.example.bookstore.controller;
 import static org.example.bookstore.util.BookUtil.createBookDto;
 import static org.example.bookstore.util.BookUtil.createBookRequestDto;
 import static org.example.bookstore.util.BookUtil.createListOfBookDtos;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -18,7 +21,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.example.bookstore.dto.book.BookDto;
 import org.example.bookstore.dto.book.CreateBookRequestDto;
 import org.example.bookstore.exception.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,8 +55,7 @@ public class BookControllerTest {
     @DisplayName("""
         Create a new book with valid RequestDto is successful
             """)
-    @Sql(scripts = "classpath:database/categories/insert-two-categories.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "classpath:database/categories/insert-two-categories.sql")
     @Sql(scripts = {
         "classpath:database/bookscategories/delete-from-books-categories.sql",
         "classpath:database/books/delete-from-books.sql",
@@ -74,8 +75,8 @@ public class BookControllerTest {
         BookDto actual = objectMapper.readValue(
                 result.getResponse().getContentAsString(), BookDto.class
         );
-        Assertions.assertNotNull(actual);
-        Assertions.assertNotNull(actual.getId());
+        assertNotNull(actual);
+        assertNotNull(actual.getId());
         EqualsBuilder.reflectionEquals(expected, actual, "id");
     }
 
@@ -105,7 +106,7 @@ public class BookControllerTest {
         "classpath:database/categories/insert-two-categories.sql",
         "classpath:database/books/insert-three-books.sql",
         "classpath:database/bookscategories/insert-three-books-categories.sql"
-    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    })
     @Sql(scripts = {
         "classpath:database/bookscategories/delete-from-books-categories.sql",
         "classpath:database/books/delete-from-books.sql",
@@ -124,8 +125,8 @@ public class BookControllerTest {
                 contentNode.toString(),
             new TypeReference<List<BookDto>>() {}
         );
-        Assertions.assertEquals(3, actual.size());
-        Assertions.assertEquals(expected, actual);
+        assertEquals(3, actual.size());
+        assertEquals(expected, actual);
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
@@ -140,7 +141,7 @@ public class BookControllerTest {
         "classpath:database/books/insert-single-book.sql",
         "classpath:database/bookscategories/insert-three-books-categories.sql",
         "classpath:database/bookscategories/insert-single-books-category.sql"
-    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    })
     @Sql(scripts = {
         "classpath:database/bookscategories/delete-from-books-categories.sql",
         "classpath:database/books/delete-from-books.sql",
@@ -164,7 +165,7 @@ public class BookControllerTest {
         BookDto actual = objectMapper.readValue(
                 result.getResponse().getContentAsString(), BookDto.class
         );
-        Assertions.assertNotNull(actual);
+        assertNotNull(actual);
         EqualsBuilder.reflectionEquals(expected, actual);
     }
 
@@ -184,10 +185,10 @@ public class BookControllerTest {
             )
                 .andExpect(status().isNotFound())
                 .andExpect(result ->
-                Assertions.assertTrue(result.getResolvedException()
+                assertTrue(result.getResolvedException()
                     instanceof EntityNotFoundException)
             )
-                .andExpect(result -> Assertions.assertEquals(
+                .andExpect(result -> assertEquals(
                 "Cannot find a book with id: 999", result.getResolvedException().getMessage()));
     }
 
@@ -200,7 +201,7 @@ public class BookControllerTest {
         "classpath:database/categories/insert-two-categories.sql",
         "classpath:database/books/insert-three-books.sql",
         "classpath:database/bookscategories/insert-three-books-categories.sql"
-    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    })
     @Sql(scripts = {
         "classpath:database/bookscategories/delete-from-books-categories.sql",
         "classpath:database/books/delete-from-books.sql",

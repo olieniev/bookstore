@@ -1,9 +1,10 @@
 package org.example.bookstore.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.List;
 import org.example.bookstore.model.Book;
 import org.example.bookstore.repository.book.BookRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class BookRepositoryTest {
         "classpath:database/categories/insert-two-categories.sql",
         "classpath:database/books/insert-three-books.sql",
         "classpath:database/bookscategories/insert-three-books-categories.sql"
-    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    })
     @Sql(scripts = {
         "classpath:database/bookscategories/delete-from-books-categories.sql",
         "classpath:database/books/delete-from-books.sql",
@@ -39,7 +40,7 @@ public class BookRepositoryTest {
         Page<Book> booksPage = bookRepository.findAllByCategoriesId(2L, pageable);
         List<String> actual = booksPage.map(Book::getTitle).toList();
         List<String> expected = List.of("second book", "third book");
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
 }
