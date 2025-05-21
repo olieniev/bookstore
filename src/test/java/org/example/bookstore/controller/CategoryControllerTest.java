@@ -1,5 +1,6 @@
 package org.example.bookstore.controller;
 
+import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 import static org.example.bookstore.util.CategoryUtil.createCategoryDto;
 import static org.example.bookstore.util.CategoryUtil.createCategoryRequestDto;
 import static org.example.bookstore.util.CategoryUtil.createListOfCategoryDtos;
@@ -17,7 +18,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.example.bookstore.dto.category.CategoryDto;
 import org.example.bookstore.dto.category.CategoryRequestDto;
 import org.example.bookstore.exception.EntityNotFoundException;
@@ -73,7 +73,7 @@ public class CategoryControllerTest {
                 result.getResponse().getContentAsString(), CategoryDto.class
         );
         assertNotNull(actual);
-        EqualsBuilder.reflectionEquals(expected, actual);
+        assertTrue(reflectionEquals(expected, actual, "id"));
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
@@ -146,7 +146,7 @@ public class CategoryControllerTest {
                 result.getResponse().getContentAsString(), CategoryDto.class
         );
         assertNotNull(actual);
-        EqualsBuilder.reflectionEquals(expected, actual);
+        assertTrue(reflectionEquals(expected, actual, "id"));
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
