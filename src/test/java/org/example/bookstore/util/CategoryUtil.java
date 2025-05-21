@@ -37,6 +37,14 @@ public class CategoryUtil {
         return categoryDto;
     }
 
+    public static CategoryDto createUnexpectedDto() {
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(999L);
+        categoryDto.setName("Unexpected name");
+        categoryDto.setDescription("Unexpected description");
+        return categoryDto;
+    }
+
     public static List<CategoryDto> createListOfCategoryDtos() {
         CategoryDto firstDto = new CategoryDto();
         firstDto.setId(1L);

@@ -1,9 +1,12 @@
 package org.example.bookstore.controller;
 
+import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 import static org.example.bookstore.util.CategoryUtil.createCategoryDto;
 import static org.example.bookstore.util.CategoryUtil.createCategoryRequestDto;
 import static org.example.bookstore.util.CategoryUtil.createListOfCategoryDtos;
+import static org.example.bookstore.util.CategoryUtil.createUnexpectedDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -17,7 +20,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.example.bookstore.dto.category.CategoryDto;
 import org.example.bookstore.dto.category.CategoryRequestDto;
 import org.example.bookstore.exception.EntityNotFoundException;
@@ -73,7 +75,8 @@ public class CategoryControllerTest {
                 result.getResponse().getContentAsString(), CategoryDto.class
         );
         assertNotNull(actual);
-        EqualsBuilder.reflectionEquals(expected, actual);
+        assertTrue(reflectionEquals(expected, actual, "id"));
+        assertFalse(reflectionEquals(createUnexpectedDto(), actual));
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
@@ -146,7 +149,8 @@ public class CategoryControllerTest {
                 result.getResponse().getContentAsString(), CategoryDto.class
         );
         assertNotNull(actual);
-        EqualsBuilder.reflectionEquals(expected, actual);
+        assertTrue(reflectionEquals(expected, actual, "id"));
+        assertFalse(reflectionEquals(createUnexpectedDto(), actual));
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})

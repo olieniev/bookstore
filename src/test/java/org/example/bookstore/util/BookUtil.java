@@ -39,6 +39,17 @@ public class BookUtil {
         return bookDto;
     }
 
+    public static BookDto createUnexpectedDto() {
+        BookDto bookDto = new BookDto();
+        bookDto.setId(777L);
+        bookDto.setTitle("Unexpected book");
+        bookDto.setAuthor("Unexpected author");
+        bookDto.setIsbn("Unexpected isbn");
+        bookDto.setPrice(BigDecimal.valueOf(9.99));
+        bookDto.setCategoryIds(List.of(2L));
+        return bookDto;
+    }
+
     public static BookDto mapBookDtoToBook(Book book) {
         BookDto bookDto = new BookDto();
         bookDto.setId(book.getId());

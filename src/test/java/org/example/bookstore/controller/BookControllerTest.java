@@ -1,9 +1,12 @@
 package org.example.bookstore.controller;
 
+import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 import static org.example.bookstore.util.BookUtil.createBookDto;
 import static org.example.bookstore.util.BookUtil.createBookRequestDto;
 import static org.example.bookstore.util.BookUtil.createListOfBookDtos;
+import static org.example.bookstore.util.BookUtil.createUnexpectedDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -17,7 +20,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.example.bookstore.dto.book.BookDto;
 import org.example.bookstore.dto.book.CreateBookRequestDto;
 import org.example.bookstore.exception.EntityNotFoundException;
@@ -77,7 +79,8 @@ public class BookControllerTest {
         );
         assertNotNull(actual);
         assertNotNull(actual.getId());
-        EqualsBuilder.reflectionEquals(expected, actual, "id");
+        assertTrue(reflectionEquals(expected, actual, "id"));
+        assertFalse(reflectionEquals(createUnexpectedDto(), actual));
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
@@ -166,7 +169,8 @@ public class BookControllerTest {
                 result.getResponse().getContentAsString(), BookDto.class
         );
         assertNotNull(actual);
-        EqualsBuilder.reflectionEquals(expected, actual);
+        assertTrue(reflectionEquals(expected, actual));
+        assertFalse(reflectionEquals(createUnexpectedDto(), actual));
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
