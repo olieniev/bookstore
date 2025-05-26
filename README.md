@@ -14,104 +14,31 @@ The main technology behind the project is Java and Spring Boot. It has all the n
 - JUnit 4.13.2
 - Swagger 5.20.1
 - Mapstruct 1.6.3
+- AWS - EC2, ECR, RDS
 ---
 ### 🧨 Functionality
 1. Registration, authentication and authorization:
-   - Registration and login flow
+   - Registration (`POST /auth/registration`) and login (`POST /auth/login`) flow
    - JWT token after successful login
    - Roles functionality (Admin and User(customer)).
    - The fields of both requests are validated By Hibernate validator!
 2. Book creation, searching, update and deletion (CRUD):
-   - As an admin user, I have permission to create, update, delete books from the store.
-   - As a customer/user, I am able to see all books, perform parametrized search of books, search by book id or simply retrieve all available books.
+   - As an admin user, I have permission to create(`POST /books`), update(`PUT /books/{id})`, delete(`DELETE /books/{id}`) books from the store.
+   - As a customer/user, I am able to see all books(`GET /books`), perform parametrized search of books(`GET /search`), search by book id(`GET /books/{id}`).
 3. Category creation, searching, update and deletion (CRUD):
-   - Admin is able to perform CRUD operations with categories
-   - User is able to look retrieve categories by id, see all of them OR find all books that belong to a particular category, e.g. science fiction books.
+   - Admin is able to perform CRUD operations with categories (`POST/GET /categories`, `PUT/DELETE /categories/{id}`).
+   - User is able to retrieve categories by id(`GET /categories/{id}`), see all of them OR find all books that belong to a particular category, e.g. science fiction books(`GET /categories/{id}/books`).
 4. User shopping cart is assigned to each user at the time of successful registration:
-   - User is able to see his cart, add book items to it via book id and desired quantity
-   - Optionally, user may modify his cart item quantity by cart item id or delete it.
+   - User is able to see his cart(`GET /cart`), add book items to it via book id and desired quantity(`POST /cart`).
+   - Optionally, user may modify his cart item quantity by cart item id(`PUT /cart/items/{id}`) or delete it(`DELETE /cart/items/{id}`).
 5. And lastly, order functionality:
-   - User is able to see all his orders (if any),
-   - Create a new order using a provided address and items in his shopping cart,
-   - Retrieve info on a specific order by order id OR info on specific order item by order id + order item id.
-   - Admin is able to modify/update order status, e.g. "Order placed" -> "Processing".
+   - User is able to see his orders (`GET /orders`),
+   - Create a new order using a provided address and items in his shopping cart(`POST /orders`).
+   - Retrieve info on a specific order by order id(`GET /orders/{orderId}/items`) OR info on specific order item by order id + order item id(`GET /orders/{orderId}/items/{orderItemId}`).
+   - Admin is able to modify/update order status, e.g. "Order placed" -> "Processing"(`PUT /orders/{id}`).
 ---
-### 🔗 DB relations
-```
-User
-├── Role (ManyToMany)
-├── ShoppingCart (OneToOne)
-│   └── CartItem (ManyToOne)
-│       └── Book (OneToMany)
-├── Order (ManyToOne)
-│   └── OrderItem (ManyToOne)
-│       └── Book (ManyToOne)
-
-Book
-└── Category (ManyToMany)
-```
----
-### 🔬 Project Model Structures
-
-👤 **User**
-- `id`
-- `email` — unique
-- `password` — hashed
-- `firstName`
-- `lastName`
-- `shippingAddress` — optional
-- `roles` — assigned role(s)
-- `isDeleted`
-
-🎫 **Role**
-- `id`
-- `name` — role name (e.g., `ADMIN`, `USER`)
-
-📘 **Book**
-- `id`
-- `title` — book title
-- `author` — author name
-- `isbn` — unique identifier
-- `price`
-- `description` — optional
-- `coverImage` — optional
-- `isDeleted`
-- `categories`
-
-🗂️ **Category**
-- `id`
-- `name`
-- `description` — optional
-- `isDeleted`
-
-🛒 **ShoppingCart**
-- `id` — same as the associated user id
-- `user` — one-to-one relation
-- `cartItems` — items in the cart
-- `isDeleted`
-
-📦 **CartItem**
-- `id`
-- `shoppingCart` — reference to cart
-- `book` — reference to book
-- `quantity`
-
-📬 **Order**
-- `id`
-- `user` — who placed the order
-- `status` — current state (e.g., `ORDER_PLACED`, `DELIVERED`)
-- `total`
-- `orderDate`
-- `shippingAddress`
-- `orderItems` — items in the order
-- `isDeleted`
-
-🧾 **OrderItem**
-- `id`
-- `order` — parent order
-- `book` — book purchased
-- `quantity`
-- `price` — at time of order
+### 🔬 UML Diagram
+![Class Diagram](uml.png)
 ---
 ### 🔧 How to run and build the project locally
 - Install:
