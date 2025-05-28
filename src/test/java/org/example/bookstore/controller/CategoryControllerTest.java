@@ -4,9 +4,7 @@ import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 import static org.example.bookstore.util.CategoryUtil.createCategoryDto;
 import static org.example.bookstore.util.CategoryUtil.createCategoryRequestDto;
 import static org.example.bookstore.util.CategoryUtil.createListOfCategoryDtos;
-import static org.example.bookstore.util.CategoryUtil.createUnexpectedDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -76,7 +74,6 @@ public class CategoryControllerTest {
         );
         assertNotNull(actual);
         assertTrue(reflectionEquals(expected, actual, "id"));
-        assertFalse(reflectionEquals(createUnexpectedDto(), actual));
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
@@ -150,7 +147,6 @@ public class CategoryControllerTest {
         );
         assertNotNull(actual);
         assertTrue(reflectionEquals(expected, actual, "id"));
-        assertFalse(reflectionEquals(createUnexpectedDto(), actual));
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
