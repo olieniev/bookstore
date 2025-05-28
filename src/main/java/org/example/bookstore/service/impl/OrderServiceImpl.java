@@ -61,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDto> getOrders(Authentication authentication, Pageable pageable) {
-        return orderRepository.findAllByUserId(findUser(authentication), pageable)
+        return orderRepository.findAllByUserId(findUser(authentication).getId(), pageable)
             .map(orderMapper::toDto);
     }
 
