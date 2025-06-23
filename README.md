@@ -58,7 +58,7 @@ docker compose up
 ```
 http://localhost:8080/api/swagger-ui/index.html 
 ```
-
+🔧 Note: currently N/A due to AWS free tier limit exceeding.
 ❗Alternatively, you can simply access the bookstore on the prod (yes, it is live on AWS!) here:
 ```
 http://ec2-13-61-21-221.eu-north-1.compute.amazonaws.com/swagger-ui/index.html
